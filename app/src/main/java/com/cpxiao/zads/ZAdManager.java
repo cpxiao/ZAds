@@ -1,0 +1,233 @@
+package com.cpxiao.zads;
+
+import android.content.Context;
+import android.support.v4.util.ArrayMap;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+
+import com.cpxiao.zads.ads.AdMobBannerAd;
+import com.cpxiao.zads.ads.FbBannerAd;
+import com.cpxiao.zads.ads.FbNativeAd;
+import com.cpxiao.zads.ads.core.Advertisement;
+import com.cpxiao.zads.core.AdConfigBean;
+import com.cpxiao.zads.core.ZAdListener;
+import com.cpxiao.zads.core.ZAdPosition;
+import com.cpxiao.zads.core.ZAdType;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+
+
+/**
+ * @author cpxiao on 2017/08/10.
+ */
+public class ZAdManager {
+
+    private static final boolean DEBUG = ZAdConfig.DEBUG;
+    private static final String TAG = ZAdManager.class.getSimpleName();
+
+    //广告配置数据
+    private ArrayMap<Integer, List<AdConfigBean>> mAdConfigArrayMap = null;
+
+    //成功获取的广告
+    private ArrayMap<Integer, Advertisement> mLoadedAdViewArrayMap = new ArrayMap<>();
+
+    //单例模式
+    private static volatile ZAdManager mInstance = null;
+
+    private ZAdManager() {
+
+    }
+
+    public static ZAdManager getInstance() {
+        if (mInstance == null) {
+            synchronized (ZAdManager.class) {
+                if (mInstance == null) {
+                    mInstance = new ZAdManager();
+                }
+            }
+        }
+        return mInstance;
+    }
+
+    /**
+     * 初始化
+     *
+     * @param context context
+     */
+    public void init(final Context context) {
+        mAdConfigArrayMap = ZAdDefaultConfig.getDefaultConfig(context);
+    }
+
+    /**
+     * 清空所有广告，包含缓存广告
+     */
+    public void destroyAllPosition() {
+        destroyAll(ZAdPosition.POSITION_HOME);
+        destroyAll(ZAdPosition.POSITION_CLASS_GAME);
+        destroyAll(ZAdPosition.POSITION_TIME_GAME);
+        destroyAll(ZAdPosition.POSITION_RESULT);
+        destroyAll(ZAdPosition.POSITION_LEVEL_LIST);
+        System.gc();
+    }
+
+    /**
+     * 清空所有广告，包含缓存广告
+     *
+     * @param position 广告位
+     */
+    public void destroyAll(int position) {
+        if (mLoadedAdViewArrayMap == null) {
+            if (DEBUG) {
+                throw new IllegalArgumentException("destroyAllView() error!  mLoadedAdViewArrayMap == null");
+            }
+            return;
+        }
+        Advertisement advertisement = mLoadedAdViewArrayMap.get(position);
+        if (advertisement == null) {
+            if (DEBUG) {
+                Log.d(TAG, "destroyAllView() -> 奇怪，此广告位无广告View！advertisement == null, position = " + position);
+            }
+            return;
+        }
+        advertisement.destroyAllView();
+    }
+
+    public void loadAd(final Context appCxt, final int position, final LinearLayout layout) {
+        if (layout == null) {
+            if (DEBUG) {
+                String msg = "loadAd: param error! layout == null";
+                Log.d(TAG, msg);
+                throw new IllegalArgumentException(msg);
+            }
+            return;
+        }
+        if (appCxt == null || mAdConfigArrayMap == null) {
+            if (DEBUG) {
+                String msg = "loadAd: param error! 广告未进行初始化配置!";
+                Log.d(TAG, msg);
+                throw new IllegalArgumentException(msg);
+            }
+            return;
+        }
+
+        List<AdConfigBean> list = mAdConfigArrayMap.get(position);
+        if (list == null || list.isEmpty()) {
+            if (DEBUG) {
+                String msg = "loadAd: error! 服务器广告配置信息空！position = " + position;
+                Log.d(TAG, msg);
+                throw new IllegalArgumentException(msg);
+            }
+            return;
+        }
+        //先排队
+        Queue<Advertisement> queue = new ArrayBlockingQueue<>(list.size());
+        for (AdConfigBean advertiser : list) {
+            Advertisement advertisement = getAdvertisement(appCxt, advertiser);
+            if (advertisement != null) {
+                queue.add(advertisement);
+            }
+        }
+        if (DEBUG) {
+            Log.d(TAG, "loadAd: queue.size() = " + queue.size());
+        }
+        //请求第一个,如果失败请求下一个
+        final Advertisement advertisement = queue.poll();
+        //此处有个坑，注意回调的时候要在主线程中，否则有些广告会crash！
+        advertisement.setListener(new ZAdListener() {
+            @Override
+            public void onLoadSuccess(Advertisement ad) {
+                if (DEBUG) {
+                    Log.d(TAG, "onLoadSuccess: " + ad.toString() + ", position = " + position);
+                }
+                // TODO 统计：广告请求成功
+
+                mLoadedAdViewArrayMap.put(position, ad);
+
+                layout.removeAllViews();
+                View adView = ad.getLastAdView();
+                if (adView != null) {
+                    layout.addView(adView);
+                }
+            }
+
+            @Override
+            public void onLoadFailed(Advertisement ad, String message, Queue<Advertisement> next) {
+                if (DEBUG) {
+                    Log.d(TAG, "onLoadFailed: " + ad.toString() + ", position = " + position + ", msg = " + message);
+                }
+                // TODO 统计：广告请求失败
+
+                //获取下一个广告商并加载
+                Advertisement advertisementNext = next.poll();
+                if (advertisementNext == null) {
+                    if (DEBUG) {
+                        Log.d(TAG, "当前广告位请求全部失败, position = " + position);
+                    }
+                    return;
+                }
+                advertisementNext.setListener(this);
+                advertisementNext.load(appCxt, next);
+                // TODO 统计：广告请求开始
+
+                if (DEBUG) {
+                    Log.d(TAG, "请求下一个广告商: " + advertisementNext.toString() + ", position = " + position);
+                }
+            }
+
+            @Override
+            public void onAdClick(Advertisement ad) {
+                if (DEBUG) {
+                    Log.d(TAG, "onAdClick: " + ad.toString() + ", position = " + position);
+                }
+                // TODO 统计：广告点击
+
+            }
+        });
+        advertisement.load(appCxt, queue);
+        // TODO 统计：广告请求开始
+
+        if (DEBUG) {
+            Log.d(TAG, "请求广告商: " + advertisement.toString() + ", position = " + position);
+        }
+    }
+
+    private Advertisement getAdvertisement(Context context, AdConfigBean adConfigBean) {
+        if (context == null || adConfigBean == null) {
+            if (DEBUG) {
+                String msg = "getAdvertisement: param error!  context == null || adConfigBean == null";
+                Log.d(TAG, msg);
+                throw new IllegalArgumentException(msg);
+            }
+            return null;
+        }
+        switch (adConfigBean.adType) {
+            case ZAdType.AD_FB_BANNER: {
+                return new FbBannerAd(adConfigBean);
+            }
+            case ZAdType.AD_FB_NATIVE: {
+                return new FbNativeAd(adConfigBean);
+            }
+            case ZAdType.AD_ADMOB_BANNER: {
+                return new AdMobBannerAd(adConfigBean);
+            }
+            case ZAdType.AD_ADMOB_NATIVE: {
+                //
+            }
+            case ZAdType.AD_IMMOBI_BANNER: {
+                //                return new InMobiBannerAd(adConfigBean);
+            }
+            default: {
+                if (DEBUG) {
+                    String msg = "getAdvertisement: ZAdType error!  adConfigBean.adType = " + adConfigBean.adType;
+                    Log.d(TAG, msg);
+                    throw new IllegalArgumentException(msg);
+                }
+                return null;
+            }
+        }
+    }
+
+}

@@ -1,0 +1,11 @@
+include ':app'
+
+include ':AndroidUtils'
+project(':AndroidUtils').projectDir = new File('../AndroidUtils/')
+include ':AndroidUtils:library'
+
+//include ':AndroidMiniGame'
+//project (':AndroidMiniGame').projectDir = new File('../AndroidMiniGame/')
+//include ':AndroidMiniGame:library'
+
+
