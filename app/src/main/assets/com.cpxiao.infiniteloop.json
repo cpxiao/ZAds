@@ -8,31 +8,59 @@
     "data": [
       {
         "ad_position": 1,
-        "ad_type": 3,
+        "ad_type": 1,
         "ad_size": 1,
         "publish_id": "",
-        "place_id": "ca-app-pub-4157365005379790/1348986869"
+        "place_id": ""
       },
       {
         "ad_position": 1,
         "ad_type": 2,
-        "ad_size": 1,
+        "ad_size": 0,
         "publish_id": "",
-        "place_id": "370166039990535_370325199974619"
+        "place_id": "ca-app-pub-4157365005379790/1737248065"
+      },
+      {
+        "ad_position": 1,
+        "ad_type": 3,
+        "ad_size": 0,
+        "publish_id": "",
+        "place_id": "1579509002351231_1717553488546781"
+      },
+      {
+        "ad_position": 1,
+        "ad_type": 4,
+        "ad_size": 0,
+        "publish_id": "",
+        "place_id": "1579509002351231_1579509065684558"
       },
       {
         "ad_position": 2,
-        "ad_type": 3,
+        "ad_type": 1,
         "ad_size": 1,
         "publish_id": "",
-        "place_id": "ca-app-pub-4157365005379790/6102087266"
+        "place_id": ""
       },
       {
         "ad_position": 2,
         "ad_type": 2,
-        "ad_size": 1,
+        "ad_size": 0,
         "publish_id": "",
-        "place_id": "370166039990535_370325486641257"
+        "place_id": "ca-app-pub-4157365005379790/3476602460"
+      },
+      {
+        "ad_position": 2,
+        "ad_type": 3,
+        "ad_size": 0,
+        "publish_id": "",
+        "place_id": "1579509002351231_1717553571880106"
+      },
+      {
+        "ad_position": 2,
+        "ad_type": 4,
+        "ad_size": 0,
+        "publish_id": "",
+        "place_id": "1579509002351231_1579509275684537"
       }
     ]
   },

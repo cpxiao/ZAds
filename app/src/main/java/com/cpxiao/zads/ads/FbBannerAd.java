@@ -19,6 +19,8 @@ import com.facebook.ads.AdSettings;
 import com.facebook.ads.AdSize;
 import com.facebook.ads.AdView;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 
@@ -84,18 +86,29 @@ public class FbBannerAd extends BaseZAd {
                     mZAdListener.onAdClick(get());
                 }
             }
+
+            @Override
+            public void onLoggingImpression(Ad ad) {
+                if (DEBUG) {
+                    Log.d(TAG, "onLoggingImpression: ");
+                }
+            }
         });
         if (DEBUG) {
-            AdSettings.addTestDevice("5abafbb8d38c6037c32c4652b08d1feb");// 20170810 HUAWEI G621-TL00
-            AdSettings.addTestDevice("4cc7bc8aabecb9642ff2e06d6bcebac4");// 20170810 模拟器Nexus_5X_API_25_7.1.1
+            //            AdSettings.addTestDevice("e6298923190b4e7e7119e0f14c44f097");
+
+            // 如果想要添加多台测试设备，只需创建一个字符串列表，添加到加载广告前的位置：
+            List<String> testDevices = new ArrayList<>();
+            testDevices.add("37d6f63e9a828b876eda13efa16483c8");
+            AdSettings.addTestDevices(testDevices);
         }
         mAdManager.loadAd();
     }
 
 
     @Override
-    public void destroyAllView() {
-        super.destroyAllView();
+    public void destroyAllView(Context context) {
+        super.destroyAllView(context);
 
         removeFromParent(mAdManager);
         if (mAdManager != null) {
@@ -110,33 +123,36 @@ public class FbBannerAd extends BaseZAd {
         }
         removeFromParent(bannerView);
 
-        if (size == ZAdSize.BANNER_300X250) {
-            LinearLayout view = new LinearLayout(c);
-            view.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, dip2px(250));
-            view.addView(bannerView, params);
-            return view;
+        if (size == ZAdSize.BANNER_320X50) {
+            return createView(c, bannerView, 50);
+        } else if (size == ZAdSize.BANNER_320X100) {
+            return createView(c, bannerView, 90);
+        } else if (size == ZAdSize.BANNER_300X250) {
+            return createView(c, bannerView, 250);
         } else {
-            if (size != ZAdSize.BANNER_320X50) {
-                if (DEBUG) {
-                    throw new IllegalArgumentException("No Size found in " + TAG);
-                }
+            if (DEBUG) {
+                throw new IllegalArgumentException("No Size found in " + TAG);
             }
-            LinearLayout view = new LinearLayout(c);
-            view.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, dip2px(50));
-            view.addView(bannerView, params);
-            return view;
+            return createView(c, bannerView, 50);
         }
     }
 
+    private View createView(Context c, AdView bannerView, int height) {
+        LinearLayout view = new LinearLayout(c);
+        view.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, dip2px(height));
+        view.addView(bannerView, params);
+        return view;
+    }
+
     private AdSize getAdSize(int size) {
-        if (size == ZAdSize.BANNER_300X250) {
-            return AdSize.RECTANGLE_HEIGHT_250;
-        } else if (size == ZAdSize.BANNER_320X50) {
+        if (size == ZAdSize.BANNER_320X50) {
             return AdSize.BANNER_HEIGHT_50;
+        } else if (size == ZAdSize.BANNER_320X100) {
+            return AdSize.BANNER_HEIGHT_90;
+        } else if (size == ZAdSize.BANNER_300X250) {
+            return AdSize.RECTANGLE_HEIGHT_250;
         } else {
             if (DEBUG) {
                 throw new IllegalArgumentException("No Size found in " + TAG);

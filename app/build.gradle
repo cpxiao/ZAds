@@ -57,30 +57,28 @@ android {
 dependencies {
     compile project(':AndroidUtils:library')
 
+    compile "com.android.support:support-v4:25.3.1"
     /**
      * Ads Start
      */
-    //ZAds SDK
-//    compile 'com.github.bumptech.glide:glide:3.7.0'
-    //Facebook广告
-    compile files('libs/AudienceNetwork_v4.7.jar')
-    //AdMob广告
-    compile 'com.google.firebase:firebase-ads:9.4.0'
-    //InMobi广告
-//    compile "com.inmobi.monetization:inmobi-ads:6.2.0"
-////    compile "com.android.support:appcompat-v7:25.3.1"
-//    compile "com.android.support:support-annotations:${androidSupportLibVersion}"
-//    compile "com.android.support:support-v4:${androidSupportLibVersion}"
-//    compile "com.google.android.gms:play-services:9.4.0"
-//    compile "com.facebook.fresco:fresco:0.5.0"
-//    compile "com.squareup.picasso:picasso:2.5.2"
+    //友盟统计
+    compile 'com.umeng.analytics:analytics:latest.integration'
 
+    //Facebook广告
+//    compile files('libs/AudienceNetwork_v4.7.jar')
+    compile 'com.facebook.android:audience-network-sdk:4.25.0'
+
+    //AdMob广告
+    compile 'com.google.firebase:firebase-ads:11.0.0'
+
+    //ZAds SDK
+    compile 'com.github.bumptech.glide:glide:3.7.0'//要放在后面
     /**
      * Ads End
      */
 
     compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

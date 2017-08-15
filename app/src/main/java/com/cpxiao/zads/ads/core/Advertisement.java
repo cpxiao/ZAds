@@ -38,6 +38,6 @@ public interface Advertisement {
      * 清空所有广告，包含缓存广告
      * 注意: 原生广告需要取消关联，则必须重写此方法
      */
-    void destroyAllView();
+    void destroyAllView(Context context);
 
 }

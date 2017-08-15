@@ -1,4 +1,4 @@
-package com.cpxiao.zads;
+package com.cpxiao.zads.core;
 
 import android.content.Context;
 import android.support.v4.util.ArrayMap;
@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.cpxiao.BuildConfig;
-import com.cpxiao.zads.core.AdConfigBean;
+import com.cpxiao.zads.ZAdsConfig;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class ZAdDefaultConfig {
 
-    private static final boolean DEBUG = ZAdConfig.DEBUG;
+    private static final boolean DEBUG = ZAdsConfig.DEBUG;
     private static final String TAG = ZAdDefaultConfig.class.getSimpleName();
 
     /**

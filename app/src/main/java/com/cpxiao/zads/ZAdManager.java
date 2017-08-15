@@ -7,10 +7,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.cpxiao.zads.ads.AdMobBannerAd;
+import com.cpxiao.zads.ads.AdMobNativeExpressAd;
 import com.cpxiao.zads.ads.FbBannerAd;
 import com.cpxiao.zads.ads.FbNativeAd;
 import com.cpxiao.zads.ads.core.Advertisement;
 import com.cpxiao.zads.core.AdConfigBean;
+import com.cpxiao.zads.core.ZAdDefaultConfig;
 import com.cpxiao.zads.core.ZAdListener;
 import com.cpxiao.zads.core.ZAdPosition;
 import com.cpxiao.zads.core.ZAdType;
@@ -25,7 +27,7 @@ import java.util.concurrent.ArrayBlockingQueue;
  */
 public class ZAdManager {
 
-    private static final boolean DEBUG = ZAdConfig.DEBUG;
+    private static final boolean DEBUG = ZAdsConfig.DEBUG;
     private static final String TAG = ZAdManager.class.getSimpleName();
 
     //广告配置数据
@@ -64,12 +66,12 @@ public class ZAdManager {
     /**
      * 清空所有广告，包含缓存广告
      */
-    public void destroyAllPosition() {
-        destroyAll(ZAdPosition.POSITION_HOME);
-        destroyAll(ZAdPosition.POSITION_CLASS_GAME);
-        destroyAll(ZAdPosition.POSITION_TIME_GAME);
-        destroyAll(ZAdPosition.POSITION_RESULT);
-        destroyAll(ZAdPosition.POSITION_LEVEL_LIST);
+    public void destroyAllPosition(Context context) {
+        destroy(context, ZAdPosition.POSITION_HOME);
+        destroy(context, ZAdPosition.POSITION_GAME);
+        destroy(context, ZAdPosition.POSITION_LEVEL_LIST);
+        destroy(context, ZAdPosition.POSITION_SETTINGS);
+
         System.gc();
     }
 
@@ -78,28 +80,30 @@ public class ZAdManager {
      *
      * @param position 广告位
      */
-    public void destroyAll(int position) {
+    private void destroy(Context context, int position) {
         if (mLoadedAdViewArrayMap == null) {
             if (DEBUG) {
-                throw new IllegalArgumentException("destroyAllView() error!  mLoadedAdViewArrayMap == null");
+                String msg = "destroy: param error! mLoadedAdViewArrayMap == null";
+                Log.e(TAG, msg);
+                throw new IllegalArgumentException(msg);
             }
             return;
         }
         Advertisement advertisement = mLoadedAdViewArrayMap.get(position);
         if (advertisement == null) {
             if (DEBUG) {
-                Log.d(TAG, "destroyAllView() -> 奇怪，此广告位无广告View！advertisement == null, position = " + position);
+                Log.d(TAG, "destroy: 此广告位无广告View！advertisement == null, position = " + position);
             }
             return;
         }
-        advertisement.destroyAllView();
+        advertisement.destroyAllView(context);
     }
 
     public void loadAd(final Context appCxt, final int position, final LinearLayout layout) {
         if (layout == null) {
             if (DEBUG) {
                 String msg = "loadAd: param error! layout == null";
-                Log.d(TAG, msg);
+                Log.e(TAG, msg);
                 throw new IllegalArgumentException(msg);
             }
             return;
@@ -107,7 +111,7 @@ public class ZAdManager {
         if (appCxt == null || mAdConfigArrayMap == null) {
             if (DEBUG) {
                 String msg = "loadAd: param error! 广告未进行初始化配置!";
-                Log.d(TAG, msg);
+                Log.e(TAG, msg);
                 throw new IllegalArgumentException(msg);
             }
             return;
@@ -116,7 +120,7 @@ public class ZAdManager {
         List<AdConfigBean> list = mAdConfigArrayMap.get(position);
         if (list == null || list.isEmpty()) {
             if (DEBUG) {
-                String msg = "loadAd: error! 服务器广告配置信息空！position = " + position;
+                String msg = "loadAd: error! 此广告位的配置信息为空！position = " + position;
                 Log.d(TAG, msg);
                 throw new IllegalArgumentException(msg);
             }
@@ -204,20 +208,17 @@ public class ZAdManager {
             return null;
         }
         switch (adConfigBean.adType) {
-            case ZAdType.AD_FB_BANNER: {
-                return new FbBannerAd(adConfigBean);
-            }
-            case ZAdType.AD_FB_NATIVE: {
-                return new FbNativeAd(adConfigBean);
+            case ZAdType.AD_ADMOB_NATIVE: {
+                return new AdMobNativeExpressAd(adConfigBean);
             }
             case ZAdType.AD_ADMOB_BANNER: {
                 return new AdMobBannerAd(adConfigBean);
             }
-            case ZAdType.AD_ADMOB_NATIVE: {
-                //
+            case ZAdType.AD_FB_NATIVE: {
+                return new FbNativeAd(adConfigBean);
             }
-            case ZAdType.AD_IMMOBI_BANNER: {
-                //                return new InMobiBannerAd(adConfigBean);
+            case ZAdType.AD_FB_BANNER: {
+                return new FbBannerAd(adConfigBean);
             }
             default: {
                 if (DEBUG) {

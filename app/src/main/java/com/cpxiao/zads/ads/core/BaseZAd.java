@@ -6,7 +6,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.cpxiao.zads.ZAdConfig;
+import com.cpxiao.zads.ZAdsConfig;
 import com.cpxiao.zads.core.AdConfigBean;
 import com.cpxiao.zads.core.ZAdListener;
 import com.cpxiao.zads.utils.ThreadUtils;
@@ -19,7 +19,7 @@ import java.util.Queue;
  */
 public abstract class BaseZAd implements Advertisement {
 
-    protected static final boolean DEBUG = ZAdConfig.DEBUG;
+    protected static final boolean DEBUG = ZAdsConfig.DEBUG;
 
     /**
      * ZAdListener
@@ -106,7 +106,7 @@ public abstract class BaseZAd implements Advertisement {
     }
 
     @Override
-    public void destroyAllView() {
+    public void destroyAllView(Context context) {
         removeFromParent(mLastAdView);
         mLastAdView = null;
     }

@@ -1,6 +1,7 @@
 package com.cpxiao.zads.views;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
@@ -10,13 +11,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.cpxiao.zads.ZAdConfig;
+import com.cpxiao.AppConfig;
 
 /**
  * @author cpxiao on 2017/08/10.
  */
 public class ZBannerView extends FrameLayout {
-    private static final boolean DEBUG = ZAdConfig.DEBUG;
+    private static final boolean DEBUG = AppConfig.DEBUG;
     private static final String TAG = ZBannerView.class.getSimpleName();
 
     private ImageView mIcon;
@@ -32,11 +33,13 @@ public class ZBannerView extends FrameLayout {
         setBackgroundColor(Color.WHITE);
         mIcon = new ImageView(c);
         mIcon.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+
         mTitle = new TextView(c);
         mTitle.setTextColor(Color.BLACK);
         mTitle.setSingleLine();
         mTitle.setMaxLines(1);
         mTitle.setEllipsize(TextUtils.TruncateAt.END);
+
         mDescription = new TextView(c);
         mDescription.setTextColor(Color.GRAY);
         mDescription.setMaxLines(1);
@@ -46,22 +49,22 @@ public class ZBannerView extends FrameLayout {
 
         //        int mScreenWidth = getResources().getDisplayMetrics().widthPixels;
         //        int iconW = (int) (mScreenWidth * 0.138);
-        int iconW = dip2px(getContext(), 50);
+        int iconW = dip2px(50);
         LayoutParams paramsIcon = new LayoutParams(iconW, iconW);
         paramsIcon.gravity = Gravity.CENTER_VERTICAL;
         addView(mIcon, paramsIcon);
 
         LayoutParams paramsTitle = new LayoutParams(-1, -1);
-        paramsTitle.setMargins(dip2px(c, 68.0f), 0, 0, 0);
+        paramsTitle.setMargins(dip2px(68.0f), 0, 0, 0);
         addView(mTitle, paramsTitle);
 
         LayoutParams paramsDesc = new LayoutParams(-1, -1);
-        paramsDesc.setMargins(dip2px(c, 68.0f), dip2px(c, 28.0f), 0, 0);
+        paramsDesc.setMargins(dip2px(68.0f), dip2px(28.0f), 0, 0);
         addView(mDescription, paramsDesc);
 
         //尽量与CommonRankItem的图标及文字对齐
         //        setPadding(dip2px(c, 18), dip2px(c, 10), dip2px(c, 18), dip2px(c, 10));
-        setPadding(dip2px(c, 18), 0, dip2px(c, 18), 0);
+        setPadding(dip2px(18), 0, dip2px(18), 0);
     }
 
     public void bindData(Context context, String icon, String title, String desc) {
@@ -85,13 +88,11 @@ public class ZBannerView extends FrameLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public int dip2px(Context context, float dipValue) {
-        float m = context.getResources().getDisplayMetrics().density;
-        return (int) (dipValue * m + 0.5f);
+    public int dip2px(float dipValue) {
+        return (int) (dipValue * Resources.getSystem().getDisplayMetrics().density + 0.5f);
     }
 
-    public int px2dip(Context context, float pxValue) {
-        float m = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / m + 0.5f);
+    public int px2dip(float pxValue) {
+        return (int) (pxValue / Resources.getSystem().getDisplayMetrics().density + 0.5f);
     }
 }

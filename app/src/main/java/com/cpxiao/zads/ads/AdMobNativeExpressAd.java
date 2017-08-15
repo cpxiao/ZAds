@@ -1,60 +1,46 @@
 package com.cpxiao.zads.ads;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import com.cpxiao.R;
 import com.cpxiao.zads.ads.core.Advertisement;
 import com.cpxiao.zads.ads.core.BaseZAd;
 import com.cpxiao.zads.core.AdConfigBean;
 import com.cpxiao.zads.core.ZAdSize;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.NativeExpressAdView;
 
 import java.util.Queue;
 
 
 /**
- * @author cpxiao on 2017/08/10.
+ * @author cpxiao on 2017/08/12.
  */
-public class AdMobBannerAd extends BaseZAd {
-    private static final String TAG = "AdMobBannerAd";
+public class AdMobNativeExpressAd extends BaseZAd {
+    private static final String TAG = "AdMobNativeExpressAd";
 
-    private AdView mAdManager;
+    private NativeExpressAdView mAdManager;
 
-    public AdMobBannerAd(AdConfigBean advertiser) {
+    public AdMobNativeExpressAd(AdConfigBean advertiser) {
         super(advertiser);
     }
 
 
     @Override
     public void loadAd(final Context c, final Queue<Advertisement> next) {
-        //参数校验
-        if (TextUtils.isEmpty(mPlaceId)) {
-            if (DEBUG) {
-                String msg = "loadAd: param error!";
-                Log.d(TAG, msg);
-                throw new IllegalArgumentException(msg);
-            }
-            return;
-        }
-
+        //注意：参数配置在xml文件中了
         if (DEBUG) {
             Log.d(TAG, "loadAd: mPublishId = " + mPublishId + ", mPlaceId = " + mPlaceId);
         }
-        if (mAdManager != null) {
-            mAdManager.destroy();
-            mAdManager = null;
-        }
-        mAdManager = new AdView(c);
-        mAdManager.setAdUnitId(mPlaceId);
-        mAdManager.setAdSize(getAdSize(mAdSize));
+        View view = LayoutInflater.from(c).inflate(R.layout.layout_ads_admob_native_fullwidthx100_home, null, true);
+        mAdManager = (NativeExpressAdView) view.findViewById(R.id.adView);
 
         mAdManager.setAdListener(new AdListener() {
             @Override
@@ -108,7 +94,7 @@ public class AdMobBannerAd extends BaseZAd {
         if (DEBUG) {
             adRequest = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)// All emulators
-                    .addTestDevice("A9B3C1E3301941FC7CF518C47F6991D2")
+                    .addTestDevice("67F59060394DB36B95B18F5EE5B5D735")
                     .build();
         } else {
             adRequest = new AdRequest.Builder()
@@ -135,12 +121,11 @@ public class AdMobBannerAd extends BaseZAd {
 
     }
 
-    private View generateView(Context c, AdView bannerView, int size) {
+    private View generateView(Context c, NativeExpressAdView bannerView, int size) {
         if (c == null || bannerView == null) {
             return null;
         }
         removeFromParent(bannerView);
-
         if (size == ZAdSize.BANNER_320X50) {
             return createView(c, bannerView, 50);
         } else if (size == ZAdSize.BANNER_320X100) {
@@ -153,34 +138,15 @@ public class AdMobBannerAd extends BaseZAd {
             }
             return createView(c, bannerView, 50);
         }
-
     }
 
-    private View createView(Context c, AdView bannerView, int height) {
+    private View createView(Context c, NativeExpressAdView bannerView, int height) {
         LinearLayout view = new LinearLayout(c);
         view.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, dip2px(height));
         view.addView(bannerView, params);
         return view;
-    }
-
-    private AdSize getAdSize(int size) {
-        if (DEBUG) {
-            Log.d(TAG, "getAdSize: size = " + size);
-        }
-        if (size == ZAdSize.BANNER_320X50) {
-            return AdSize.SMART_BANNER;
-        } else if (size == ZAdSize.BANNER_320X100) {
-            return AdSize.LARGE_BANNER;
-        } else if (size == ZAdSize.BANNER_300X250) {
-            return AdSize.MEDIUM_RECTANGLE;
-        } else {
-            if (DEBUG) {
-                throw new IllegalArgumentException("No Size found in " + TAG);
-            }
-            return AdSize.SMART_BANNER;
-        }
     }
 
     @Override
