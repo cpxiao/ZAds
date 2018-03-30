@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.cpxiao.R;
-import com.cpxiao.gamelib.activity.BaseActivity;
+import com.cpxiao.gamelib.activity.BaseZAdsActivity;
 import com.cpxiao.zads.ZAdManager;
 import com.cpxiao.zads.core.ZAdPosition;
 
@@ -15,7 +15,7 @@ import com.cpxiao.zads.core.ZAdPosition;
  *
  * @author cpxiao on 2017/08/10.
  */
-public class HomeActivity extends BaseActivity {
+public class HomeActivity extends BaseZAdsActivity {
 
 
     @Override

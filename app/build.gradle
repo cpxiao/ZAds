@@ -2,15 +2,17 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
-        applicationId "com.cpxiao.infiniteloop"
+        applicationId "com.cpxiao.zads"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
         versionName "1.0.0"
+        flavorDimensions "channel"
     }
+
     buildTypes {
         release {
             minifyEnabled true //混淆
@@ -23,39 +25,51 @@ android {
     productFlavors {
         gp {}
     }
+
     productFlavors.all {
 //            flavor -> flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
     }
-    //修改生成的apk名字
-    applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-            def oldFile = output.outputFile
-            def packageName = applicationId;
-            if (variant.buildType.name.equals('release')) {
-                def releaseApkName = packageName +
-                        "_v" + defaultConfig.versionName +
-                        "_" + variant.productFlavors[0].name +
-                        "_" + new Date().format('yyyyMMddHHmm') +
-                        '.apk'
-                output.outputFile = new File(oldFile.parent, releaseApkName)
-            }
-            if (variant.buildType.name.equals('beta')) {
-                def baseApkName = packageName +
-                        "_v" + defaultConfig.versionName + "beta" +
-                        "_" + variant.productFlavors[0].name +
-                        "_" + new Date().format('yyyyMMddHHmm') +
-                        '.apk'
-                output.outputFile = new File(oldFile.parent, baseApkName)
-            }
-            if (variant.buildType.name.equals('debug')) {
 
-            }
+    //修改生成的apk名字
+//    applicationVariants.all { variant ->
+//        variant.outputs.each { output ->
+//            def oldFile = output.outputFile
+//            def packageName = applicationId;
+//            if (variant.buildType.name.equals('release')) {
+//                def releaseApkName = packageName +
+//                        "_v" + defaultConfig.versionName +
+//                        "_" + variant.productFlavors[0].name +
+//                        "_" + new Date().format('yyyyMMddHHmm') +
+//                        '.apk'
+//                output.outputFile = new File(oldFile.parent, releaseApkName)
+//            }
+//            if (variant.buildType.name.equals('beta')) {
+//                def baseApkName = packageName +
+//                        "_v" + defaultConfig.versionName + "beta" +
+//                        "_" + variant.productFlavors[0].name +
+//                        "_" + new Date().format('yyyyMMddHHmm') +
+//                        '.apk'
+//                output.outputFile = new File(oldFile.parent, baseApkName)
+//            }
+//            if (variant.buildType.name.equals('debug')) {
+//
+//            }
+//        }
+//    }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = applicationId +
+                    "_v" + defaultConfig.versionName +
+                    "_" + variant.productFlavors[0].name +
+                    "_" + new Date().format('yyyyMMddHHmm') +
+                    '.apk'
         }
     }
 }
 
 dependencies {
-    compile project(':AndroidUtils:library')
+    compile project(':__AndroidUtils:library')
 
     compile "com.android.support:support-v4:25.3.1"
     /**
@@ -81,4 +95,4 @@ dependencies {
 
 }
 
-apply plugin: 'com.google.gms.google-services'
+//apply plugin: 'com.google.gms.google-services'

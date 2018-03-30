@@ -24,7 +24,7 @@ import com.umeng.analytics.MobclickAgent;
  * @author cpxiao on 2017/03/01.
  * @version cpxiao on 2017/08/10 改成使用ZAdsSdk.
  */
-public class BaseActivity extends Activity {
+public class BaseZAdsActivity extends Activity {
     protected static final boolean DEBUG = AppConfig.DEBUG;
     protected final String TAG = getClass().getSimpleName();
 
